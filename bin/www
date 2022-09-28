@@ -12,6 +12,7 @@ require('dotenv').config();
 
 const ViberBot = require('viber-bot').Bot;
 const BotEvents = require('viber-bot').Events;
+const TextMessage = require('viber-bot').Message.Text;
 
 const fs = require('fs');
 
@@ -21,7 +22,7 @@ const bot = new ViberBot({
   avatar: "http://viber.com/avatar.jpg" // It is recommended to be 720x720, and no more than 100kb.
 });
 
-bot.on(BotEvents.MESSAGE_RECEIVED, (message, response) => {
+bot.on(BotEvents.MESSAGE_RECEIVED, async(message, response) => {
   console.log('----------------------------------------------------------------');
   console.log(`${new Date().toLocaleString('ru')} New message: `, message.text);
   console.log('From: ', response.userProfile.id, );
@@ -52,9 +53,8 @@ const options = {
   cert: fs.readFileSync(certPathStr),
   ca: fs.readFileSync(caPathStr),
 };
-const server = https.createServer(options, app);
-
-console.log(`${new Date().toLocaleString('ru')} Server created: `, server);
+const server = https.createServer(serverSSLOptions, bot.middleware()).listen(port, () => bot.setWebhook(`${process.env.PUBLIC_URL}:${port}`));
+console.log(`${new Date().toLocaleString('ru')} Server created`);
 
 /**
  * Listen on provided port, on all network interfaces.
