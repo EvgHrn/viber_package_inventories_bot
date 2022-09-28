@@ -6,20 +6,31 @@
 
 var app = require('../app');
 var debug = require('debug')('viber-package-inventories-bot:server');
-var http = require('http');
+var https = require('https');
+
+const fs = require('fs');
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || '4003');
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+const keyPathStr = `${process.env.SSL_KEY_PATH_FILE}`;
+const certPathStr = `${process.env.SSL_CERT_PATH_FILE}`;
+const caPathStr = `${process.env.SSL_CA_PATH_FILE}`;
+// console.log("SSL options: ", keyPathStr, certPathStr, caPathStr);
+const options = {
+  key: fs.readFileSync(keyPathStr),
+  cert: fs.readFileSync(certPathStr),
+  ca: fs.readFileSync(caPathStr),
+};
+const server = https.createServer(options, app);
 
 /**
  * Listen on provided port, on all network interfaces.
