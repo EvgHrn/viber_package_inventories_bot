@@ -8,7 +8,29 @@ var app = require('../app');
 var debug = require('debug')('viber-package-inventories-bot:server');
 var https = require('https');
 
+require('dotenv').config();
+
+const ViberBot = require('viber-bot').Bot;
+const BotEvents = require('viber-bot').Events;
+
 const fs = require('fs');
+
+const bot = new ViberBot({
+  authToken: process.env.TOKEN,
+  name: "Описи",
+  avatar: "http://viber.com/avatar.jpg" // It is recommended to be 720x720, and no more than 100kb.
+});
+
+bot.on(BotEvents.MESSAGE_RECEIVED, (message, response) => {
+  console.log('----------------------------------------------------------------');
+  console.log(`${new Date().toLocaleString('ru')} New message: `, message.text);
+  console.log('From: ', response.userProfile.id, );
+  console.log('Name: ', response.userProfile.name);
+
+  bot.sendMessage({id: process.env.ADMIN_ID}, new TextMessage(`New message from user: ${response.userProfile.id} ${response.userProfile.name}: ${message.text}`));
+
+  response.send(message);
+});
 
 /**
  * Get port from environment and store in Express.
@@ -31,6 +53,8 @@ const options = {
   ca: fs.readFileSync(caPathStr),
 };
 const server = https.createServer(options, app);
+
+console.log(`${new Date().toLocaleString('ru')} Server created: `, server);
 
 /**
  * Listen on provided port, on all network interfaces.
