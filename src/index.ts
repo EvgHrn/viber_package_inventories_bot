@@ -4,9 +4,9 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('viber-package-inventories-bot:server');
-var https = require('https');
+const app = require('../app');
+const debug = require('debug')('viber-package-inventories-bot:server');
+const https = require('https');
 
 require('dotenv').config();
 
@@ -22,7 +22,7 @@ const bot = new ViberBot({
   avatar: "http://viber.com/avatar.jpg" // It is recommended to be 720x720, and no more than 100kb.
 });
 
-bot.on(BotEvents.MESSAGE_RECEIVED, async(message, response) => {
+bot.on(BotEvents.MESSAGE_RECEIVED, async(message: any, response: any) => {
   console.log('----------------------------------------------------------------');
   console.log(`${new Date().toLocaleString('ru')} New message: `, message.text);
   console.log('From: ', response.userProfile.id, );
@@ -37,7 +37,7 @@ bot.on(BotEvents.MESSAGE_RECEIVED, async(message, response) => {
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '4003');
+const port = normalizePort(process.env.PORT || '4003');
 app.set('port', port);
 
 /**
@@ -53,14 +53,13 @@ const options = {
   cert: fs.readFileSync(certPathStr),
   ca: fs.readFileSync(caPathStr),
 };
-const server = https.createServer(serverSSLOptions, bot.middleware()).listen(port, () => bot.setWebhook(`${process.env.PUBLIC_URL}:${port}`));
+const server = https.createServer(options, bot.middleware()).listen(port, () => bot.setWebhook(`${process.env.PUBLIC_URL}:${port}`));
 console.log(`${new Date().toLocaleString('ru')} Server created`);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
@@ -68,8 +67,8 @@ server.on('listening', onListening);
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val) {
-  var port = parseInt(val, 10);
+function normalizePort(val: any) {
+  const port = parseInt(val, 10);
 
   if (isNaN(port)) {
     // named pipe
@@ -88,12 +87,12 @@ function normalizePort(val) {
  * Event listener for HTTP server "error" event.
  */
 
-function onError(error) {
+function onError(error: any) {
   if (error.syscall !== 'listen') {
     throw error;
   }
 
-  var bind = typeof port === 'string'
+  const bind = typeof port === 'string'
     ? 'Pipe ' + port
     : 'Port ' + port;
 
@@ -117,8 +116,8 @@ function onError(error) {
  */
 
 function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
+  const addr = server.address();
+  const bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
