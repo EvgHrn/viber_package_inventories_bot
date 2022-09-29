@@ -4,18 +4,18 @@
  * Module dependencies.
  */
 
+const debug = require('debug')('viber-package-inventories-bot:server');
+const https = require('https');
+import nodeFetch from 'node-fetch';
+
+require('dotenv').config();
+
 const mongoose = require('mongoose');
 
 const user = process.env.DB_USER;
 const pwd = process.env.DB_PWD;
 const dbPort = process.env.DB_PORT;
 const addr = process.env.DB_ADDR;
-
-const debug = require('debug')('viber-package-inventories-bot:server');
-const https = require('https');
-const nodeFetch = require('node-fetch');
-
-require('dotenv').config();
 
 const ViberBot = require('viber-bot').Bot;
 const BotEvents = require('viber-bot').Events;
@@ -148,17 +148,17 @@ const sendServiceMessage = async (messageText: string, st:string) => {
   const url = process.env.SERVER_ADDR + "sendservicemessage";
 
   try {
-    const response = await fetch(url, {
+    const response = await nodeFetch(url, {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
-      mode: 'cors', // no-cors, *cors, same-origin
-      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-      credentials: 'same-origin', // include, *same-origin, omit
+      // mode: 'cors', // no-cors, *cors, same-origin
+      // cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      // credentials: 'same-origin', // include, *same-origin, omit
       headers: {
         'Content-Type': 'application/json'
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
-      redirect: 'follow', // manual, *follow, error
-      referrerPolicy: 'no-referrer', // no-referrer, *client
+      // redirect: 'follow', // manual, *follow, error
+      // referrerPolicy: 'no-referrer', // no-referrer, *client
       body: JSON.stringify({ messageText, st }) // body data type must match "Content-Type" header
     });
     return await response.json(); // parses JSON response into native JavaScript objects
