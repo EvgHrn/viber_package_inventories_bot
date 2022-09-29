@@ -37,7 +37,7 @@ bot.on(BotEvents.MESSAGE_RECEIVED, async(message: any, response: any) => {
 
   bot.sendMessage({id: process.env.ADMIN_ID}, new TextMessage(`New message from user: ${response.userProfile.id} ${response.userProfile.name}: ${message.text}`));
 
-  const newItem = await addAndDeleteViberUserIdToDirection(response.userProfile.id, message);
+  const newItem = await addAndDeleteViberUserIdToDirection(response.userProfile.id, message.text);
 
   if(!newItem) {
     response.send(new TextMessage(`Ошибка добавления города`));
@@ -60,7 +60,7 @@ bot.on(BotEvents.MESSAGE_RECEIVED, async(message: any, response: any) => {
   // response.send(message);
 });
 
-mongoose.connect(`mongodb://${user}:${pwd}@${addr}:${dbPort}/timesheetsblocks?authSource=admin`, {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false});
+mongoose.connect(`mongodb://${user}:${pwd}@${addr}:${dbPort}/timesheetsblocks?authSource=admin`, {useNewUrlParser: true, useUnifiedTopology: true});
 
 const mongodb = mongoose.connection;
 mongodb.on('error', console.error.bind(console, 'connection error:'));
@@ -93,7 +93,7 @@ const getViberUserIdsByDirection = async (direction: string) => {
     console.log(`${new Date().toLocaleString('ru')} Getting viber user ids by direction error: `, e);
     return false;
   }
-  return item.viber_user_ids;
+  return item ? item.viber_user_ids : false;
 }
 
 const addAndDeleteViberUserIdToDirection = async (userId: string, direction: string) => {
