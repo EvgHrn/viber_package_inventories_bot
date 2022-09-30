@@ -111,6 +111,7 @@ const addAndDeleteViberUserIdToDirection = async (userId: string, direction: str
     }
     return result;
   } else {
+    console.log(`${new Date().toLocaleString('ru')} There are mailing for ${direction}: `, viberMailing);
     let newIds: string[];
     if(viberMailing.viber_user_ids.includes(userId)) {
       newIds = viberMailing.viber_user_ids.filter((viberUserId: string) => viberUserId !== userId);
@@ -119,6 +120,7 @@ const addAndDeleteViberUserIdToDirection = async (userId: string, direction: str
     }
     let item;
     try {
+      console.log(`${new Date().toLocaleString('ru')} Gonna update ${direction} with new ids: `, newIds);
       item = await InventoriesViberMailing.findOneAndUpdate({direction}, {viber_user_ids: newIds}, {new: true}).exec();
       console.log(`${new Date().toLocaleString('ru')} Updating viber user ids on ${direction} result: `, item);
     } catch (e) {
