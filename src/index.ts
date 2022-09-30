@@ -123,6 +123,7 @@ const addAndDeleteViberUserIdToDirection = async (userId: string, direction: str
       console.log(`${new Date().toLocaleString('ru')} Gonna update ${direction} with new ids: `, newIds);
       item = await InventoriesViberMailing.findOneAndUpdate({direction}, {viber_user_ids: newIds}, {new: true}).exec();
       console.log(`${new Date().toLocaleString('ru')} Updating viber user ids on ${direction} result: `, item);
+      return item;
     } catch (e) {
       console.log(`${new Date().toLocaleString('ru')} Updating viber user ids on ${direction} error: `, e);
       return false;
