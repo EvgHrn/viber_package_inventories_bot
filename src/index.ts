@@ -84,21 +84,21 @@ const inventoriesViberMailingSchema = new mongoose.Schema({
 
 const InventoriesViberMailing = mongoose.model('InventoriesViberMailing', inventoriesViberMailingSchema);
 
-const getViberUserIdsByDirection = async (direction: string) => {
+const getViberUserIdsByDirection = async (direction: string): Promise<string[] | null> => {
   let item;
   try {
     item = await InventoriesViberMailing.findOne({direction}).exec();
     console.log(`${new Date().toLocaleString('ru')} Getting viber user ids by direction result: `, item);
   } catch (e) {
     console.log(`${new Date().toLocaleString('ru')} Getting viber user ids by direction error: `, e);
-    return false;
+    return null;
   }
-  return item ? item.viber_user_ids : false;
+  return item ? item.viber_user_ids : null;
 }
 
 const addAndDeleteViberUserIdToDirection = async (userId: string, direction: string) => {
-  const viberMailing = await getViberUserIdsByDirection(direction);
-  if(!viberMailing) {
+  const viberUserIds = await getViberUserIdsByDirection(direction);
+  if(!viberUserIds) {
     console.log(`${new Date().toLocaleString('ru')} Gonna add userId to direction: `, userId, direction);
     let result;
     try {
@@ -111,12 +111,12 @@ const addAndDeleteViberUserIdToDirection = async (userId: string, direction: str
     }
     return result;
   } else {
-    console.log(`${new Date().toLocaleString('ru')} There are mailing for ${direction}: `, viberMailing);
+    console.log(`${new Date().toLocaleString('ru')} There are viber users for ${direction}: `, viberUserIds);
     let newIds: string[];
-    if(viberMailing.viber_user_ids.includes(userId)) {
-      newIds = viberMailing.viber_user_ids.filter((viberUserId: string) => viberUserId !== userId);
+    if(viberUserIds.includes(userId)) {
+      newIds = viberUserIds.filter((viberUserId: string) => viberUserId !== userId);
     } else {
-      newIds = [...viberMailing.viber_user_ids, userId];
+      newIds = [...viberUserIds, userId];
     }
     let item;
     try {
