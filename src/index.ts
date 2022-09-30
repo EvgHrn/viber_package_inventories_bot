@@ -32,9 +32,31 @@ const bot = new ViberBot({
 
 app.use("/viber/webhook", bot.middleware());
 
-app.get('/', (req: any, res: any) => {
-  res.send('Hello World!')
-})
+app.post('/inventory', async (req: any, res: any) => {
+
+  console.log(`${new Date().toLocaleString('ru')} Post package inventory: `, req.body.direction, req.body.inventoryStr);
+
+  const usersIds: string[] | null = await getViberUserIdsByDirection(req.body.direction);
+
+  if(!usersIds) {
+    console.error(`${new Date().toLocaleString('ru')} Getting viber user ids by direction error`);
+    // @ts-ignore
+    await sendServiceMessage(`viber: Ошибка получения пользователей по городу ${req.body.direction}`, process.env.SECRET);
+    res.status(500).end();
+    return;
+  }
+
+  for(const userId of usersIds) {
+    bot.sendMessage(
+      {id: userId},
+      new TextMessage(
+        req.body.inventoryStr
+      )
+    );
+  }
+
+  res.status(200).send();
+});
 
 bot.on(BotEvents.MESSAGE_RECEIVED, async(message: any, response: any) => {
   console.log('----------------------------------------------------------------');
