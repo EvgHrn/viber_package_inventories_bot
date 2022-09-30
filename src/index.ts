@@ -7,10 +7,11 @@
 const debug = require('debug')('viber-package-inventories-bot:server');
 const https = require('https');
 import nodeFetch from 'node-fetch';
-
+const express = require('express');
 require('dotenv').config();
 
 const mongoose = require('mongoose');
+const app = express();
 
 const user = process.env.DB_USER;
 const pwd = process.env.DB_PWD;
@@ -28,6 +29,12 @@ const bot = new ViberBot({
   name: "Описи",
   avatar: "http://viber.com/avatar.jpg" // It is recommended to be 720x720, and no more than 100kb.
 });
+
+app.use("/viber/webhook", bot.middleware());
+
+app.get('/', (req: any, res: any) => {
+  res.send('Hello World!')
+})
 
 bot.on(BotEvents.MESSAGE_RECEIVED, async(message: any, response: any) => {
   console.log('----------------------------------------------------------------');
@@ -190,7 +197,10 @@ const options = {
   cert: fs.readFileSync(certPathStr),
   ca: fs.readFileSync(caPathStr),
 };
-const server = https.createServer(options, bot.middleware()).listen(port, () => bot.setWebhook(`${process.env.PUBLIC_URL}:${port}`));
+
+app.set('port', port);
+
+const server = https.createServer(options, app).listen(port, () => bot.setWebhook(`${process.env.PUBLIC_URL}:${port}`));
 console.log(`${new Date().toLocaleString('ru')} Server created`);
 
 /**
