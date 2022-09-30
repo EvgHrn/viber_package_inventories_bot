@@ -8,9 +8,11 @@ const debug = require('debug')('viber-package-inventories-bot:server');
 const https = require('https');
 import nodeFetch from 'node-fetch';
 const express = require('express');
+const bodyParser = require("body-parser");
+const mongoose = require('mongoose');
 require('dotenv').config();
 
-const mongoose = require('mongoose');
+
 const app = express();
 
 const user = process.env.DB_USER;
@@ -30,7 +32,17 @@ const bot = new ViberBot({
   avatar: "http://viber.com/avatar.jpg" // It is recommended to be 720x720, and no more than 100kb.
 });
 
+app.use(bodyParser.urlencoded({limit: '10mb', extended: true}));
+app.use(bodyParser.json({limit: '10mb', extended: true}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use("/viber/webhook", bot.middleware());
+
+app.use(function (req: any, res: any, next: any) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization");
+  next();
+});
 
 app.post('/inventory', async (req: any, res: any) => {
 
@@ -43,6 +55,14 @@ app.post('/inventory', async (req: any, res: any) => {
     // @ts-ignore
     await sendServiceMessage(`viber: Ошибка получения пользователей по городу ${req.body.direction}`, process.env.SECRET);
     res.status(500).end();
+    return;
+  }
+
+  if(!usersIds.length) {
+    console.log(`${new Date().toLocaleString('ru')} No users to send ${req.body.direction} inventory`);
+    // @ts-ignore
+    await sendServiceMessage(`viber: Нет подписчиков для описи ${req.body.direction}`, process.env.SECRET);
+    res.status(410).end();
     return;
   }
 
