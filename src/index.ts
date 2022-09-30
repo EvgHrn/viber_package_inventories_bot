@@ -134,15 +134,16 @@ const inventoriesViberMailingSchema = new mongoose.Schema({
 const InventoriesViberMailing = mongoose.model('InventoriesViberMailing', inventoriesViberMailingSchema);
 
 const getViberUserIdsByDirection = async (direction: string): Promise<string[] | null> => {
-  let item;
+  let items;
   try {
-    item = await InventoriesViberMailing.findOne({direction}).exec();
-    console.log(`${new Date().toLocaleString('ru')} Getting viber user ids by direction result: `, item);
+    items = await InventoriesViberMailing.find({direction}).exec();
+    console.log(`${new Date().toLocaleString('ru')} Getting viber user ids by direction result: `, items);
   } catch (e) {
     console.log(`${new Date().toLocaleString('ru')} Getting viber user ids by direction error: `, e);
     return null;
   }
-  return item ? item.viber_user_ids : null;
+  if(!items) return null;
+  return items.length ? items[0].viber_user_ids : [];
 }
 
 const addAndDeleteViberUserIdToDirection = async (userId: string, direction: string) => {
